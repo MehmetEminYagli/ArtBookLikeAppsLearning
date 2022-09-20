@@ -23,7 +23,9 @@ import android.widget.Toast;
 import com.google.android.material.snackbar.Snackbar;
 import com.mehmet.artbooklikeappslearning.databinding.ActivityDetailBinding;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 
 public class detailAct extends AppCompatActivity {
@@ -49,6 +51,39 @@ public class detailAct extends AppCompatActivity {
 
     public void Save(View view) {
 
+        String name = binding.ArtName.getText().toString();
+        String ArtistName = binding.artistName.getText().toString();
+        String year = binding.artYear.getText().toString();
+
+        Bitmap smallImage = makesmallImage(SecilenResim,300);
+
+        //resmi SQL 'e kayıt edilebilecek sisteme çevirme
+        ByteArrayOutputStream SqlresimKayit = new ByteArrayOutputStream();
+        smallImage.compress(Bitmap.CompressFormat.PNG,50, SqlresimKayit);
+        byte[] byteDizi = SqlresimKayit.toByteArray();
+        //sql 'e kayıt edilebilecek şekilde 0 ve 1 lere dönüştürdük ve byteDizi içerisine kayıt ettik
+
+    }
+
+    public Bitmap makesmallImage(Bitmap resim , int MaximumSize){
+        int Width = resim.getWidth();
+        int Height = resim.getHeight();
+        //genislik / yükseklik > 1 ise yatay
+        //genislik / yükseklik < 1 ise dikey
+
+        float bitmapOran = (float) (Width/Height);
+
+        if (bitmapOran > 1) { //yatay
+            Width = MaximumSize;
+            Height = (int) (Width / bitmapOran);
+        }else {
+            //dikey
+            Height = MaximumSize;
+            Width = (Height * MaximumSize);
+        }
+
+        //bu methodun bize bir değer dönrümesi gerekiyor
+        return Bitmap.createScaledBitmap(resim ,100,100,true);
     }
 
     public  void  SelectImage(View view){
