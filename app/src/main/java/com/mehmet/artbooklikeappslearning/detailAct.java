@@ -11,6 +11,8 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.graphics.Bitmap;
 import android.graphics.ImageDecoder;
 import android.net.Uri;
@@ -39,6 +41,9 @@ public class detailAct extends AppCompatActivity {
     //bitmap için seçilen resmin bitmap'ini genel yaptım ki her yerde kullanabileyim
     Bitmap SecilenResim;
 
+    //database'i her yerde kullanabilmek için yazıyorum
+    SQLiteDatabase database;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +51,7 @@ public class detailAct extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
         RegisterLauncher();
+
 
     }
 
@@ -62,6 +68,41 @@ public class detailAct extends AppCompatActivity {
         smallImage.compress(Bitmap.CompressFormat.PNG,50, SqlresimKayit);
         byte[] byteDizi = SqlresimKayit.toByteArray();
         //sql 'e kayıt edilebilecek şekilde 0 ve 1 lere dönüştürdük ve byteDizi içerisine kayıt ettik
+
+
+        //veriyi save butonuna basılıca kayıt etmek istiyorum
+
+        database = this.openOrCreateDatabase("arts",MODE_PRIVATE,null);
+
+        try {
+
+            database.execSQL("CREATE TABLE IF NOT EXISTS arts (id INTEGER , artname VARCHAR , paintername VARCHAR , year Varchar, image BLOB)");
+
+            //verileri kayıt etme kısmı
+            String sqliteString = "INSERT INTO arts(id,artname,paintername,year,image) VALUES (?,?,?,?)";
+            SQLiteStatement verikaydet = database.compileStatement(sqliteString);
+            //verileri tiplerine göre bağlıyorum
+            //sql de indexler 0 dan değil 1 den başlıyor
+            verikaydet.bindString(1,name);
+            verikaydet.bindString(2,ArtistName);
+            verikaydet.bindString(3,year);
+            verikaydet.bindBlob(4,byteDizi);
+
+            verikaydet.execute();
+
+            //veri kaydetme işi bitti
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        Intent intent = new Intent(detailAct.this,MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); //bütün sayfaları kapat
+        startActivity(intent); // sonra mainactivity sayfasını aç
+        //burada yaptığım şey veri kaydettikten sonra bizi ana sayfaya yönlendiriyor ana sayfada ise kaydettiği veriyi görücek
+        //diğer sayfaları kapatıyorum neden çünkü uygulama hızlı çalışsın diye.
+
+
 
     }
 
