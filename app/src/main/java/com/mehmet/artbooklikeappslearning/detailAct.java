@@ -57,15 +57,6 @@ public class detailAct extends AppCompatActivity {
 
     }
 
-    public  void  Sil(View view){
-        try {
-            database = this.openOrCreateDatabase("Deneme2",MODE_PRIVATE,null);
-            database.execSQL("DROP table  arts");
-        }catch (Exception e){
-
-        }
-    }
-
     public void Save(View view) {
 
         String name = binding.ArtName.getText().toString();
