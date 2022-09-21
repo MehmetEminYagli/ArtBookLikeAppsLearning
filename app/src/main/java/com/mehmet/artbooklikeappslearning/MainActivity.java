@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,9 +14,14 @@ import android.view.View;
 
 import com.mehmet.artbooklikeappslearning.databinding.ActivityMainBinding;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+
+    //artArraylist oluşturdum okunan verileri bu diziye ekliyeceğim
+    ArrayList<Art> ArtarrayList;
 
 
     @Override
@@ -23,8 +30,42 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
-        ////binding methodunu kullandım
+        //binding methodunu kullandım
+
+        ArtarrayList = new ArrayList<>(); //boş diziyi burada çalıştırdım
+
+        getData();
+
     }
+
+    private void  getData(){
+//verileri database içerisind çekmek
+        try {
+
+            SQLiteDatabase database = this.openOrCreateDatabase("arts",MODE_PRIVATE,null);
+
+            Cursor cursor = database.rawQuery("SELECT * FROM arts",null);
+            int idIndex = cursor.getColumnIndex("id");
+            int nameIndex = cursor.getColumnIndex("artname");
+
+            while(cursor.moveToNext()){
+                // kaç tane veri olduğunu bilmediğimiz için cursor ileriye doğru hareket ettikçe devam et diyoruz
+
+                int id = cursor.getInt(idIndex);
+                String name = cursor.getString(nameIndex);
+
+                //art diye class oluşturup constructor ile arraylist yapıyorum ve arrayliste ekliyorum
+                Art art = new Art(name, id);
+                //burada da boş diziye ekliyorum
+                ArtarrayList.add(art);
+            }
+            cursor.close();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

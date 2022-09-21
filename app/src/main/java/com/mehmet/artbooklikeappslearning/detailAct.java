@@ -52,7 +52,6 @@ public class detailAct extends AppCompatActivity {
         setContentView(view);
         RegisterLauncher();
 
-
     }
 
     public void Save(View view) {
