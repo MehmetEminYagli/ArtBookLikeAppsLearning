@@ -2,6 +2,7 @@ package com.mehmet.artbooklikeappslearning;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -22,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     //artArraylist oluşturdum okunan verileri bu diziye ekliyeceğim
     ArrayList<Art> ArtarrayList;
-
+    ArtAdapter artAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +35,14 @@ public class MainActivity extends AppCompatActivity {
 
         ArtarrayList = new ArrayList<>(); //boş diziyi burada çalıştırdım
 
+        //ÖNCELİKLE BU ARTADAPTÖRÜ RECYCLEVİEW İÇERİSİNDE BAĞLAMAMIZ ÜSTÜNE ÜSTLÜK BİRDE LAYOUT MANAGER'I VERMEMİZ GEREKİYOR
+
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        artAdapter = new ArtAdapter(ArtarrayList);
+        binding.recyclerView.setAdapter(artAdapter);
+        //komutları ile verileri recylerView id 'li kısımda gösterilecek
+
+
         getData();
 
     }
@@ -42,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 //verileri database içerisind çekmek
         try {
 
-            SQLiteDatabase database = this.openOrCreateDatabase("arts",MODE_PRIVATE,null);
+            SQLiteDatabase database = this.openOrCreateDatabase("Arts",MODE_PRIVATE,null);
 
             Cursor cursor = database.rawQuery("SELECT * FROM arts",null);
             int idIndex = cursor.getColumnIndex("id");
@@ -59,8 +68,12 @@ public class MainActivity extends AppCompatActivity {
                 //burada da boş diziye ekliyorum
                 ArtarrayList.add(art);
             }
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            //recycleView'e veri gelince abi veri geldi göster dememiz gerekiyor .
+            artAdapter.notifyDataSetChanged(); //veri seti değişti haberin olsun dememiz gerekiyor BUNU UNUTMA
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             cursor.close();
-
+            //şimdi recycleView ile verileri kullanıcaya göstericez bunun için ilk adım recycleViewadapter classı oluşturuyoruz
         }catch (Exception e){
             e.printStackTrace();
         }

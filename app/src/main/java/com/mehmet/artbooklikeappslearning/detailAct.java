@@ -52,6 +52,18 @@ public class detailAct extends AppCompatActivity {
         setContentView(view);
         RegisterLauncher();
 
+
+
+
+    }
+
+    public  void  Sil(View view){
+        try {
+            database = this.openOrCreateDatabase("Deneme2",MODE_PRIVATE,null);
+            database.execSQL("DROP table  arts");
+        }catch (Exception e){
+
+        }
     }
 
     public void Save(View view) {
@@ -71,14 +83,12 @@ public class detailAct extends AppCompatActivity {
 
         //veriyi save butonuna basılıca kayıt etmek istiyorum
 
-        database = this.openOrCreateDatabase("arts",MODE_PRIVATE,null);
-
         try {
-
-            database.execSQL("CREATE TABLE IF NOT EXISTS arts (id INTEGER , artname VARCHAR , paintername VARCHAR , year Varchar, image BLOB)");
+            database = this.openOrCreateDatabase("Arts",MODE_PRIVATE,null);
+            database.execSQL("CREATE TABLE IF NOT EXISTS arts (id INTEGER PRIMARY KEY, artname VARCHAR , paintername VARCHAR , year Varchar, image BLOB)");
 
             //verileri kayıt etme kısmı
-            String sqliteString = "INSERT INTO arts(id,artname,paintername,year,image) VALUES (?,?,?,?)";
+            String sqliteString = "INSERT INTO arts(artname,paintername,year,image) VALUES (?,?,?,?)";
             SQLiteStatement verikaydet = database.compileStatement(sqliteString);
             //verileri tiplerine göre bağlıyorum
             //sql de indexler 0 dan değil 1 den başlıyor
