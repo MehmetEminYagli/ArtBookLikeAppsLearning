@@ -1,5 +1,6 @@
 package com.mehmet.artbooklikeappslearning;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,8 +39,22 @@ public class ArtAdapter extends RecyclerView.Adapter<ArtAdapter.ArtHolder> {
         //burada da holder bize oluşturlan artholder'ı holderi kullanarak kullanıcıya göstericez
         holder.binding.recycleViewTextView.setText(artArrayList.get(position).name);
 
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(holder.itemView.getContext(),detailAct.class);
+                holder.itemView.getContext().startActivity(intent);
 
-        //bunları yazdıktan sonra oluşturulan recyclerView adaptörünü mainactivityde çağırmamız gerekiyor
+                intent.putExtra("artId",artArrayList.get(holder.getAdapterPosition()).id);
+                intent.putExtra("info","old");
+                // buradan da seçilen verinin id'sini aldık detailact kısmında kontrol edicez o id'ye uyan verileri getir diye
+
+
+                //bunları yazdıktan sonra oluşturulan recyclerView adaptörünü mainactivityde çağırmamız gerekiyor
+
+            }
+        });
+
 
     }
 

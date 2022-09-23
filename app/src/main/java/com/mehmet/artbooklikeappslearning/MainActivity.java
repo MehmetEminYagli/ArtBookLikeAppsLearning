@@ -93,7 +93,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.add_art){
-            Intent intent = new Intent(this,detailAct.class); //detailAct kısmına yönlendiriyorum
+            Intent intent = new Intent(MainActivity.this,detailAct.class); //detailAct kısmına yönlendiriyorum
+            //yeni bir verimi eklicek oynun değerini verdim şimdi artadapterda da var olan veriyimi görücek onu için putextra yazıcam
+            intent.putExtra("info","new");
             startActivity(intent);
         }
 

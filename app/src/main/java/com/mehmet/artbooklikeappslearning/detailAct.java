@@ -11,9 +11,11 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Build;
@@ -50,9 +52,74 @@ public class detailAct extends AppCompatActivity {
         binding = ActivityDetailBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+        database = this.openOrCreateDatabase("Arts",MODE_PRIVATE,null);
         RegisterLauncher();
 
 
+
+        //adaptardaki intenti getintent ile buraya alıyorum
+        Intent intent = getIntent();
+        String info = intent.getStringExtra("info");//burada info ile oluşturduğumuz sınıfın value'lerini kontrol edicez new ise yeni veri old ise var olan veriyi görücek
+
+        if (info.matches("new")) {
+
+            //kullanıcı yeni veri eklicek
+            //yeni veri ekleme kısmı kolay bütün inputların default olarak boş olmasını kontrol ederiz o kadar
+            binding.artistName.setText("");
+            binding.ArtName.setText("");
+            binding.artYear.setText("");
+            binding.button2.setVisibility(View.VISIBLE);
+            binding.imageView2.setImageResource(R.drawable.selectimage);
+            //birde buton vardı eğer yeni veri eklicekse buton gözüksün veri eklemicekse buton gözükmesin yapıcaz
+
+
+        }else {
+
+            int artId = intent.getIntExtra("artId",1);
+            //kullanıcı var olan verilere bakıcaksa save butonun göüzükmesine gerek yok
+            binding.button2.setVisibility(View.INVISIBLE);
+
+            try {
+                //kullanıcı eski verileir görücek
+                //burada da veriyi göstermek için ID 'yi almam gerek onuda adapter kısımda aldım burada çekicem o veriyi
+                //database'i burada da kullanabilmek için save kısmındaki database'i onCreate altında yazarak her yerde kullanabilirim hem burada hem save kısmında
+                Cursor cursor = database.rawQuery("SELECT * FROM arts WHERE İD =?",new String[] {String.valueOf(artId)});
+                //? işareti kısmını kullanıcıdan alıcağım için soru işareti koydum
+                //peki rawQueryde kullanıcıdan veri nasıl alıcam . İşte burada -->SelectionArgs<-- işe giriyor.
+                //selectionArgs bizden bir string dizisi ister biz diziyi ekleriz ama kontrol etmemiz gereken filte integer ise String.ValueOf ile veriyi stringe çeviririz
+                //sonrasında verileri datadan alıp göstermek kaldı
+
+                int artnameIndex = cursor.getColumnIndex("artname");
+                int painterNameIndex = cursor.getColumnIndex("paintername");
+                int yearIndex = cursor.getColumnIndex("year");
+                int imageIndex = cursor.getColumnIndex("image");
+                //sonrasında bu verileri göstemek kaldı
+
+                while(cursor.moveToNext())
+                {
+                    binding.ArtName.setText(cursor.getString(artnameIndex));
+                    binding.artistName.setText(cursor.getString(painterNameIndex));
+                    binding.artYear.setText(cursor.getString(yearIndex));
+
+                    //işler resim kısmında biraz karışıyor veri dizisini bitmap'e çevirmemiz gerekiyor hani bitmapi veriye çevirmiştik ya burada da veriyi bitmap'e çevireceğiz
+
+                    byte[] bytes = cursor.getBlob(imageIndex);
+                    //decodebytearray ile veriyidizisini bitmap'e çeviriyoruz 1.istediği veri dizisinin kendisi (bytes),
+                    //                                                                         ikimncisizi nereden başladığı (0 dan başla),
+                    //                                                                         üçüncüsü veriyi nereye kadar okuyum oda verinin uzunluğu(bytes.length)
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    //sonra bitmapi yerleştiriyoruz
+                    binding.imageView2.setImageBitmap(bitmap);
+                }
+                //cursoru kapatmayı unutma
+                cursor.close();
+            }
+
+            catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }
 
 
     }
@@ -75,7 +142,7 @@ public class detailAct extends AppCompatActivity {
         //veriyi save butonuna basılıca kayıt etmek istiyorum
 
         try {
-            database = this.openOrCreateDatabase("Arts",MODE_PRIVATE,null);
+
             database.execSQL("CREATE TABLE IF NOT EXISTS arts (id INTEGER PRIMARY KEY, artname VARCHAR , paintername VARCHAR , year Varchar, image BLOB)");
 
             //verileri kayıt etme kısmı
